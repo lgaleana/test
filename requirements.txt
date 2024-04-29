@@ -1,3 +1,7 @@
 fastapi
 pytest
 uvicorn
+requests
+beautifulsoup4
+httpx
+pytest-mock
