@@ -4,8 +4,8 @@ import requests
 
 app = FastAPI()
 
-@app.get("/scrape-images")
-def scrape_images(url: str) -> dict:
+@app.get("/extract-content")
+def extract_content(url: str) -> dict:
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
     images = []
