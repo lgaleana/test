@@ -4,7 +4,7 @@ import requests
 
 app = FastAPI()
 
-@app.get("/scrape-text")
+@app.get("/scrape")
 def scrape_text(url: str) -> dict:
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
