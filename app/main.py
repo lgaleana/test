@@ -5,7 +5,7 @@ import requests
 app = FastAPI()
 
 @app.get("/scrape-images")
-def scrape_images(url: str) -> list:
+def scrape_images(url: str) -> dict:
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
     images = []
@@ -21,4 +21,5 @@ def scrape_images(url: str) -> list:
             url_end = style.find(')', url_start)
             image_url = style[url_start:url_end].strip('"\'')
             images.append(image_url)
-    return images
+    text = soup.get_text()
+    return {'images': images, 'text': text}
