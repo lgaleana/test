@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Text and Image Extractor</title>
+</head>
+<body>
+    <h1>URL Text and Image Extractor</h1>
+    <form action="/extract" method="post">
+        <label for="url">Enter URL:</label>
+        <input type="text" id="url" name="url" required>
+        <button type="submit">Extract</button>
+    </form>
+    <div id="result">
+        <!-- Results will be displayed here -->
+    </div>
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const url = document.getElementById('url').value;
+            fetch(`/extract?url=${encodeURIComponent(url)}`, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<p>Extracted Text: ${data.text}</p>`;
+                resultDiv.innerHTML += '<h3>Images:</h3>';
+                data.images.forEach(image => {
+                    resultDiv.innerHTML += `<img src="${image}" alt="Extracted Image" style="max-width: 100%; height: auto;">`;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
