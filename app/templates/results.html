@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extraction Results</title>
+    <script>
+        function updateCanvas(imageId, textId, canvasId) {
+            const image = document.getElementById(imageId);
+            const text = document.getElementById(textId).value;
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            ctx.font = '20px Arial';
+            ctx.fillStyle = 'red';
+            ctx.fillText(text, 10, 50);
+        }
+    </script>
 </head>
 <body>
     <h1>Extraction Results</h1>
@@ -11,7 +24,9 @@
     <p>{{ text }}</p>
     <h2>Extracted Images:</h2>
     {% for image in images %}
-    <img src="{{ image }}" alt="Extracted Image" style="max-width: 100%; height: auto;">
+    <canvas id="canvas{{ loop.index }}" width="500" height="300"></canvas>
+    <input type="text" id="text{{ loop.index }}" oninput="updateCanvas('image{{ loop.index }}', 'text{{ loop.index }}', 'canvas{{ loop.index }}')">
+    <img id="image{{ loop.index }}" src="{{ image }}" alt="Extracted Image" style="display:none;">
     {% endfor %}
     <br>
     <a href="/">Go back</a>
