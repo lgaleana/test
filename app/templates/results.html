@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extraction Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script>
         function updateCanvas(imageId, textId, canvasId) {
             const image = document.getElementById(imageId);
@@ -18,17 +19,19 @@
         }
     </script>
 </head>
-<body>
-    <h1>Extraction Results</h1>
-    <h2>Extracted Text:</h2>
+<body class="bg-gray-100">
+    <h1 class="text-xl font-bold">Extraction Results</h1>
+    <h2 class="text-lg">Extracted Text:</h2>
     <p>{{ text }}</p>
-    <h2>Extracted Images:</h2>
+    <h2 class="text-lg">Extracted Images:</h2>
     {% for image in images %}
-    <canvas id="canvas{{ loop.index }}" width="500" height="300"></canvas>
-    <input type="text" id="text{{ loop.index }}" oninput="updateCanvas('image{{ loop.index }}', 'text{{ loop.index }}', 'canvas{{ loop.index }}')">
-    <img id="image{{ loop.index }}" src="{{ image }}" alt="Extracted Image" style="display:none;">
+    <div class="flex flex-col items-center mb-4">
+        <canvas id="canvas{{ loop.index }}" width="500" height="300"></canvas>
+        <img id="image{{ loop.index }}" src="{{ image }}" alt="Extracted Image" onload="updateCanvas('image{{ loop.index }}', 'text{{ loop.index }}', 'canvas{{ loop.index }}')" class="hidden">
+        <input type="text" id="text{{ loop.index }}" oninput="updateCanvas('image{{ loop.index }}', 'text{{ loop.index }}', 'canvas{{ loop.index }}')" class="mt-2">
+    </div>
     {% endfor %}
     <br>
-    <a href="/">Go back</a>
+    <a href="/" class="underline">Go back</a>
 </body>
 </html>
