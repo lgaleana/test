@@ -7,17 +7,25 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/inspect.js"></script>
     <script>
-        function updateCanvas(imageId, textId, canvasId) {
-            const image = document.getElementById(imageId);
-            const text = document.getElementById(textId).value;
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-            ctx.font = '20px Arial';
-            ctx.fillStyle = 'red';
-            ctx.fillText(text, 10, 50);
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('img');
+            images.forEach((img, index) => {
+                const canvas = document.getElementById(`canvas${index + 1}`);
+                const ctx = canvas.getContext('2d');
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const inspector = new Inspect(canvas, {
+                        text: '',
+                        resizable: true,
+                        draggable: true
+                    });
+                    const textInput = document.getElementById(`text${index + 1}`);
+                    textInput.addEventListener('input', function() {
+                        inspector.updateText(this.value);
+                    });
+                };
+            });
+        });
     </script>
 </head>
 <body class="bg-gray-100">
@@ -28,8 +36,8 @@
     {% for image in images %}
     <div class="flex flex-col items-center mb-4">
         <canvas id="canvas{{ loop.index }}" width="500" height="300"></canvas>
-        <img id="image{{ loop.index }}" src="{{ image }}" alt="Extracted Image" onload="updateCanvas('image{{ loop.index }}', 'text{{ loop.index }}', 'canvas{{ loop.index }}')" class="hidden">
-        <input type="text" id="text{{ loop.index }}" oninput="updateCanvas('image{{ loop.index }}', 'text{{ loop.index }}', 'canvas{{ loop.index }}')" class="mt-2">
+        <img id="image{{ loop.index }}" src="{{ image }}" alt="Extracted Image" class="hidden">
+        <input type="text" id="text{{ loop.index }}" class="mt-2">
     </div>
     {% endfor %}
     <br>
