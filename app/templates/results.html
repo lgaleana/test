@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extraction Results</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.11/dist/interact.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -22,8 +16,8 @@
                 listeners: {
                     move(event) {
                         var target = event.target,
-                            x = (parseFloat(target.getAttribute('data-x')) or 0),
-                            y = (parseFloat(target.getAttribute('data-y')) or 0),
+                            x = (parseFloat(target.getAttribute('data-x')) || 0),
+                            y = (parseFloat(target.getAttribute('data-y')) || 0),
                             width = event.rect.width,
                             height = event.rect.height;
                         target.style.width = width + 'px';
