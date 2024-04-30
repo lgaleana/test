@@ -13,14 +13,15 @@ def read_root(request: Request):
 
 @app.get("/extract-content")
 def extract_content(request: Request, url: str) -> HTMLResponse:
-    response = requests.get(url)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
+    response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, 'html.parser')
     images = []
-    # Extract images from <img> tags
     for img in soup.find_all('img'):
         if img.get('src'):
             images.append(img.get('src'))
-    # Extract images from any tag with a style attribute containing 'background-image'
     for tag in soup.find_all(style=True):
         style = tag['style']
         if 'background-image' in style:
