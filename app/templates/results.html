@@ -36,7 +36,7 @@
     {% for image in images %}
     <div class="flex flex-col items-center mb-4">
         <canvas id="canvas{{ loop.index }}" width="500" height="300"></canvas>
-        <img id="image{{ loop.index }}" src="{{ image }}" alt="Extracted Image" class="hidden">
+        <img id="image{{ loop.index }}" src="{{ image }}" alt="Extracted Image" class="">
         <input type="text" id="text{{ loop.index }}" class="mt-2">
     </div>
     {% endfor %}
