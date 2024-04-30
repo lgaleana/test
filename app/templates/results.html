@@ -22,8 +22,8 @@
                 listeners: {
                     move(event) {
                         var target = event.target,
-                            x = (parseFloat(target.getAttribute('data-x')) or 0),
-                            y = (parseFloat(target.getAttribute('data-y')) or 0),
+                            x = (parseFloat(target.getAttribute('data-x')) || 0),
+                            y = (parseFloat(target.getAttribute('data-y')) || 0),
                             width = event.rect.width,
                             height = event.rect.height;
                         target.style.width = width + 'px';
