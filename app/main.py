@@ -12,7 +12,7 @@ def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/extract-content")
-def extract_content(url: str) -> dict:
+def extract_content(request: Request, url: str) -> HTMLResponse:
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
     images = []
@@ -29,4 +29,4 @@ def extract_content(url: str) -> dict:
             image_url = style[url_start:url_end].strip('"\'')
             images.append(image_url)
     text = soup.get_text()
-    return {'images': images, 'text': text}
+    return templates.TemplateResponse("results.html", {"request": request, "images": images, "text": text})
