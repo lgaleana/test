@@ -3,6 +3,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from bs4 import BeautifulSoup
 import requests
+import openai
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
@@ -19,9 +24,18 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, 'html.parser')
     images = []
+    headlines = []
     for img in soup.find_all('img'):
         if img.get('src'):
             images.append(img.get('src'))
+            text = soup.get_text().strip().replace('\n', ' ')
+            prompt = f"Generate a catchy headline for an image with the following description: {text}"
+            openai_response = openai.Completion.create(
+                engine="text-davinci-002",
+                prompt=prompt,
+                max_tokens=60
+            )
+            headlines.append(openai_response.choices[0].text.strip())
     for tag in soup.find_all(style=True):
         style = tag['style']
         if 'background-image' in style:
@@ -29,5 +43,12 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
             url_end = style.find(')', url_start)
             image_url = style[url_start:url_end].strip('"\'')
             images.append(image_url)
-    text = soup.get_text()
-    return templates.TemplateResponse("results.html", {"request": request, "images": images, "text": text})
+            text = soup.get_text().strip().replace('\n', ' ')
+            prompt = f"Generate a catchy headline for an image with the following description: {text}"
+            openai_response = openai.Completion.create(
+                engine="text-davinci-002",
+                prompt=prompt,
+                max_tokens=60
+            )
+            headlines.append(openai_response.choices[0].text.strip())
+    return templates.TemplateResponse("results.html", {"request": request, "images": images, "headlines": headlines})

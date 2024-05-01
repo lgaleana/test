@@ -6,3 +6,5 @@ beautifulsoup4
 httpx
 pytest-mock
 jinja2
+openai
+python-dotenv
