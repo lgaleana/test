@@ -13,6 +13,15 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 
+def generate_headline(description: str, image_url: str) -> str:
+    prompt = f"Generate a catchy headline for an image with the following description and URL: {description}, {image_url}"
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
+        temperature=0
+    )
+    return response.choices[0].message['content'].strip()
+
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -31,13 +40,8 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
             images.append(img.get('src'))
             text = soup.get_text().strip().replace('\n', ' ')
             image_url = img.get('src')
-            prompt = f"Generate a catchy headline for an image with the following description and URL: {text}, {image_url}"
-            openai_response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
-                temperature=0
-            )
-            headlines.append(openai_response.choices[0].message['content'].strip())
+            headline = generate_headline(text, image_url)
+            headlines.append(headline)
     for tag in soup.find_all(style=True):
         style = tag['style']
         if 'background-image' in style:
@@ -46,11 +50,6 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
             image_url = style[url_start:url_end].strip('"\'')
             images.append(image_url)
             text = soup.get_text().strip().replace('\n', ' ')
-            prompt = f"Generate a catchy headline for an image with the following description and URL: {text}, {image_url}"
-            openai_response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
-                temperature=0
-            )
-            headlines.append(openai_response.choices[0].message['content'].strip())
+            headline = generate_headline(text, image_url)
+            headlines.append(headline)
     return templates.TemplateResponse("results.html", {"request": request, "images": images, "headlines": headlines})
