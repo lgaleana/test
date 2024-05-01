@@ -3,9 +3,27 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from bs4 import BeautifulSoup
 import requests
+import openai
+from dotenv import load_dotenv
+import os
+from concurrent.futures import ThreadPoolExecutor
+
+load_dotenv()
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
+
+n_images = int(os.getenv('N_IMAGES', '10'))
+
+def generate_headline(description: str, image_url: str) -> str:
+    prompt = f"Generate a catchy headline for an image with the following description and URL: {description}, {image_url}"
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
+        temperature=0
+    )
+    return response.choices[0].message['content'].strip()
 
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
@@ -18,16 +36,18 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
     }
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, 'html.parser')
+    text = soup.get_text().strip().replace('\n', ' ')
+    image_elements = soup.find_all('img') + [tag for tag in soup.find_all(style=True) if 'background-image' in tag['style']]
+    image_elements = image_elements[:n_images]
     images = []
-    for img in soup.find_all('img'):
-        if img.get('src'):
-            images.append(img.get('src'))
-    for tag in soup.find_all(style=True):
-        style = tag['style']
-        if 'background-image' in style:
-            url_start = style.find('url(') + 4
-            url_end = style.find(')', url_start)
-            image_url = style[url_start:url_end].strip('"\'')
-            images.append(image_url)
-    text = soup.get_text()
-    return templates.TemplateResponse("results.html", {"request": request, "images": images, "text": text})
+    headlines = []
+    def process_image(img):
+        image_url = img.get('src') if img.name == 'img' else img['style'].split('url(')[1].split(')')[0].strip('"\'')
+        headline = generate_headline(text, image_url)
+        return (image_url, headline)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = executor.map(process_image, image_elements)
+    for image_url, headline in results:
+        images.append(image_url)
+        headlines.append(headline)
+    return templates.TemplateResponse("results.html", {"request": request, "images": images, "headlines": headlines})
