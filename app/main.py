@@ -29,7 +29,8 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
         if img.get('src'):
             images.append(img.get('src'))
             text = soup.get_text().strip().replace('\n', ' ')
-            prompt = f"Generate a catchy headline for an image with the following description: {text}"
+            image_url = img.get('src')
+            prompt = f"Generate a catchy headline for an image with the following description and URL: {text}, {image_url}"
             openai_response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
@@ -44,7 +45,7 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
             image_url = style[url_start:url_end].strip('"\'')
             images.append(image_url)
             text = soup.get_text().strip().replace('\n', ' ')
-            prompt = f"Generate a catchy headline for an image with the following description: {text}"
+            prompt = f"Generate a catchy headline for an image with the following description and URL: {text}, {image_url}"
             openai_response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
