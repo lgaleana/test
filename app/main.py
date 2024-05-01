@@ -6,6 +6,7 @@ import requests
 import openai
 from dotenv import load_dotenv
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -35,23 +36,18 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
     }
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, 'html.parser')
+    image_elements = soup.find_all('img') + [tag for tag in soup.find_all(style=True) if 'background-image' in tag['style']]
+    image_elements = image_elements[:n_images]
     images = []
     headlines = []
-    for img in soup.find_all('img')[:n_images]:
-        if img.get('src'):
-            images.append(img.get('src'))
-            text = soup.get_text().strip().replace('\n', ' ')
-            image_url = img.get('src')
-            headline = generate_headline(text, image_url)
-            headlines.append(headline)
-    for tag in soup.find_all(style=True)[:n_images]:
-        style = tag['style']
-        if 'background-image' in style:
-            url_start = style.find('url(') + 4
-            url_end = style.find(')', url_start)
-            image_url = style[url_start:url_end].strip('"\'')
-            images.append(image_url)
-            text = soup.get_text().strip().replace('\n', ' ')
-            headline = generate_headline(text, image_url)
-            headlines.append(headline)
+    def process_image(img):
+        image_url = img.get('src') if img.name == 'img' else img['style'].split('url(')[1].split(')')[0].strip('"\'')
+        text = soup.get_text().strip().replace('\n', ' ')
+        headline = generate_headline(text, image_url)
+        return (image_url, headline)
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = executor.map(process_image, image_elements)
+    for image_url, headline in results:
+        images.append(image_url)
+        headlines.append(headline)
     return templates.TemplateResponse("results.html", {"request": request, "images": images, "headlines": headlines})
