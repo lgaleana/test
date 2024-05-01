@@ -13,6 +13,8 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 
+n_images = int(os.getenv('N_IMAGES', '10'))
+
 def generate_headline(description: str, image_url: str) -> str:
     prompt = f"Generate a catchy headline for an image with the following description and URL: {description}, {image_url}"
     response = openai.ChatCompletion.create(
@@ -35,14 +37,14 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
     soup = BeautifulSoup(response.content, 'html.parser')
     images = []
     headlines = []
-    for img in soup.find_all('img')[:10]:
+    for img in soup.find_all('img')[:n_images]:
         if img.get('src'):
             images.append(img.get('src'))
             text = soup.get_text().strip().replace('\n', ' ')
             image_url = img.get('src')
             headline = generate_headline(text, image_url)
             headlines.append(headline)
-    for tag in soup.find_all(style=True)[:10]:
+    for tag in soup.find_all(style=True)[:n_images]:
         style = tag['style']
         if 'background-image' in style:
             url_start = style.find('url(') + 4
