@@ -36,13 +36,13 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
     }
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, 'html.parser')
+    text = soup.get_text().strip().replace('\n', ' ')
     image_elements = soup.find_all('img') + [tag for tag in soup.find_all(style=True) if 'background-image' in tag['style']]
     image_elements = image_elements[:n_images]
     images = []
     headlines = []
     def process_image(img):
         image_url = img.get('src') if img.name == 'img' else img['style'].split('url(')[1].split(')')[0].strip('"\'')
-        text = soup.get_text().strip().replace('\n', ' ')
         headline = generate_headline(text, image_url)
         return (image_url, headline)
     with ThreadPoolExecutor(max_workers=2) as executor:
