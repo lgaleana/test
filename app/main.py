@@ -35,14 +35,14 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
     soup = BeautifulSoup(response.content, 'html.parser')
     images = []
     headlines = []
-    for img in soup.find_all('img'):
+    for img in soup.find_all('img')[:10]:
         if img.get('src'):
             images.append(img.get('src'))
             text = soup.get_text().strip().replace('\n', ' ')
             image_url = img.get('src')
             headline = generate_headline(text, image_url)
             headlines.append(headline)
-    for tag in soup.find_all(style=True):
+    for tag in soup.find_all(style=True)[:10]:
         style = tag['style']
         if 'background-image' in style:
             url_start = style.find('url(') + 4
