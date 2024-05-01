@@ -30,12 +30,12 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
             images.append(img.get('src'))
             text = soup.get_text().strip().replace('\n', ' ')
             prompt = f"Generate a catchy headline for an image with the following description: {text}"
-            openai_response = openai.Completion.create(
-                engine="text-davinci-002",
-                prompt=prompt,
-                max_tokens=60
+            openai_response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
+                temperature=0
             )
-            headlines.append(openai_response.choices[0].text.strip())
+            headlines.append(openai_response.choices[0].message['content'].strip())
     for tag in soup.find_all(style=True):
         style = tag['style']
         if 'background-image' in style:
@@ -45,10 +45,10 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
             images.append(image_url)
             text = soup.get_text().strip().replace('\n', ' ')
             prompt = f"Generate a catchy headline for an image with the following description: {text}"
-            openai_response = openai.Completion.create(
-                engine="text-davinci-002",
-                prompt=prompt,
-                max_tokens=60
+            openai_response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
+                temperature=0
             )
-            headlines.append(openai_response.choices[0].text.strip())
+            headlines.append(openai_response.choices[0].message['content'].strip())
     return templates.TemplateResponse("results.html", {"request": request, "images": images, "headlines": headlines})
