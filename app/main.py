@@ -3,22 +3,25 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from bs4 import BeautifulSoup
 import requests
-import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 import os
 from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
-openai.api_key = os.getenv('OPENAI_API_KEY')
 
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 
 n_images = int(os.getenv('N_IMAGES', '10'))
 
+def get_openai_client() -> OpenAI:
+    return OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
 def generate_headline(description: str, image_url: str) -> str:
+    client = get_openai_client()
     prompt = f"Generate a catchy headline for an image with the following description and URL: {description}, {image_url}"
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
         temperature=0
