@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 class MockTemplate:
     def render(self, context):
@@ -16,14 +16,16 @@ def test_template_loading(mock_template_response):
     assert response.status_code == 200
     assert 'index.html' in response.text
 
+@patch('app.main.get_openai_client')
 @patch('fastapi.templating.Jinja2Templates.TemplateResponse')
 @patch('requests.get')
-@patch('openai.ChatCompletion.create')
-def test_extract_content(mock_openai_create, mock_get, mock_template_response):
+def test_extract_content(mock_get, mock_template_response, mock_get_openai_client):
+    mock_openai_client = MagicMock()
+    mock_openai_client.chat.completions.create.return_value = type('obj', (object,), {'choices': [type('obj', (object,), {'message': {'content': 'Mocked headline'}})]})
+    mock_get_openai_client.return_value = mock_openai_client
     mock_response = mock_get.return_value
     mock_response.status_code = 200
     mock_response.content = b'<html><body><p>Example Domain</p><img src="https://example.com/image.png"><div style="background-image: url(\'https://example.com/bg.png\');"></div></body></html>'
-    mock_openai_create.return_value = type('obj', (object,), {'choices': [type('obj', (object,), {'message': {'content': 'Mocked headline'}})]})
     mock_template = MockTemplate()
     mock_template_response.return_value = mock_template.render({"request": {}, "images": [], "text": ""})
     client = TestClient(app)
