@@ -53,4 +53,4 @@ def extract_content(request: Request, url: str) -> HTMLResponse:
     for image_url, headline in results:
         images.append(image_url)
         headlines.append(headline)
-    return templates.TemplateResponse("results.html", {"request": request, "images": images, "headlines": headlines})
+    return templates.TemplateResponse("results.html", {"request": request, "images": images, "headlines": headlines, "text": text})
