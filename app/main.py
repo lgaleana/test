@@ -26,7 +26,7 @@ def generate_headline(description: str, image_url: str) -> str:
         messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
         temperature=0
     )
-    return response.choices[0].message['content'].strip()
+    return response.choices[0].message.content.strip()  # Corrected access to message content
 
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
