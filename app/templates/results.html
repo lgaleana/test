@@ -9,9 +9,12 @@
     <h1>Extraction Results</h1>
     <h2>Extracted Text:</h2>
     <p>{{ text }}</p>
-    <h2>Extracted Images:</h2>
-    {% for image in images %}
-    <img src="{{ image }}" alt="Extracted Image" style="max-width: 100%; height: auto;">
+    <h2>Extracted Images and Headlines:</h2>
+    {% for image, headline in zip(images, headlines) %}
+    <div>
+        <img src="{{ image }}" alt="Extracted Image" style="max-width: 100%; height: auto;">
+        <p>{{ headline }}</p>
+    </div>
     {% endfor %}
     <br>
     <a href="/">Go back</a>
