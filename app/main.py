@@ -16,6 +16,9 @@ def get_openai_client() -> OpenAI:
 app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 
+# Enable 'zip' in Jinja2 environment
+templates.env.globals.update(zip=zip)
+
 n_images = int(os.getenv('N_IMAGES', '10'))
 
 def generate_headline(description: str, image_url: str) -> str:
