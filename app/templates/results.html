@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extraction Results</title>
+    <script src="https://cdn.interactjs.io/v1.10.11/interact.min.js"></script>
+    <style>
+        .draggable {
+            width: auto;
+            position: absolute;
+            cursor: move;
+        }
+    </style>
 </head>
 <body>
     <h1>Extraction Results</h1>
@@ -11,12 +19,27 @@
     <p>{{ text }}</p>
     <h2>Extracted Images and Headlines:</h2>
     {% for image, headline in zip(images, headlines) %}
-    <div>
+    <div style="position: relative; display: inline-block;">
         <img src="{{ image }}" alt="Extracted Image" style="max-width: 100%; height: auto;">
-        <p>{{ headline }}</p>
+        <p class="draggable">{{ headline }}</p>
     </div>
     {% endfor %}
     <br>
     <a href="/">Go back</a>
+    <script>
+        interact('.draggable')
+            .draggable({
+                onmove: function (event) {
+                    var target = event.target,
+                        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+                        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+                    target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+                }
+            });
+    </script>
 </body>
 </html>
