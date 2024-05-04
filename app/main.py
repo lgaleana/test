@@ -23,7 +23,8 @@ n_images = int(os.getenv('N_IMAGES', '10'))
 
 def generate_headline(description: str, image_url: str) -> str:
     client = get_openai_client()
-    prompt = f"Generate a catchy headline for an image with the following description and URL: {description}, {image_url}"
+    # Updated prompt to specify a maximum of 5 words for the headline
+    prompt = f"Generate a catchy headline, no more than 5 words, for an image with the following description and URL: {description}, {image_url}"
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
