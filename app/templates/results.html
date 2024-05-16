@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extraction Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <style>
+        .draggable {
+            display: inline-block;
+            padding: 0.5em;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            cursor: move;
+            z-index: 10; /* Ensure draggable elements are on top */
+        }
+        .dropzone {
+            position: relative;
+            display: inline-block;
+        }
+        .dropzone .draggable {
+            position: absolute;
+        }
+    </style>
 </head>
 <body>
     <h1>Extraction Results</h1>
@@ -11,12 +29,40 @@
     <p>{{ text }}</p>
     <h2>Extracted Images and Headlines:</h2>
     {% for image, headline in zip(images, headlines) %}
-    <div>
+    <div class="dropzone">
         <img src="{{ image }}" alt="Extracted Image" style="max-width: 100%; height: auto;">
-        <p>{{ headline }}</p>
+        <div class="draggable" data-headline="{{ headline }}">{{ headline }}</div>
     </div>
     {% endfor %}
     <br>
     <a href="/">Go back</a>
+
+    <script>
+        interact('.draggable')
+            .draggable({
+                inertia: true,
+                modifiers: [
+                    interact.modifiers.restrictRect({
+                        restriction: 'parent',
+                        endOnly: true
+                    })
+                ],
+                autoScroll: true,
+                listeners: {
+                    move: dragMoveListener,
+                }
+            });
+
+        function dragMoveListener(event) {
+            var target = event.target;
+            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+        }
+    </script>
 </body>
 </html>
