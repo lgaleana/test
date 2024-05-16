@@ -9,7 +9,7 @@
         .draggable {
             display: inline-block;
             padding: 0.5em;
-            background-color: #f0f0f0;
+            background-color: rgba(240, 240, 240, 0.7);
             border: 1px solid #ccc;
             cursor: move;
             z-index: 10; /* Ensure draggable elements are on top */
@@ -18,8 +18,13 @@
             position: relative;
             display: inline-block;
         }
+        .dropzone img {
+            display: block;
+        }
         .dropzone .draggable {
             position: absolute;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>
