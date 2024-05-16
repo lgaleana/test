@@ -19,4 +19,14 @@ describe('Overlay Text with interact.js', () => {
       });
     });
   });
+
+  it('should display the headline on top of the image', () => {
+    cy.visit('/extract-content?url=https://thinkingofbermuda.com/');
+
+    cy.get('.dropzone').first().within(() => {
+      cy.get('img').should('exist');
+      cy.get('.draggable').should('exist');
+      cy.get('.draggable').should('have.css', 'position', 'absolute');
+    });
+  });
 });
