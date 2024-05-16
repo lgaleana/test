@@ -37,6 +37,7 @@
     <div class="dropzone">
         <img src="{{ image }}" alt="Extracted Image" style="max-width: 100%; height: auto;">
         <div class="draggable" data-headline="{{ headline }}">{{ headline }}</div>
+        <button onclick="downloadImageWithText('{{ image }}', '{{ headline }}')">Download</button>
     </div>
     {% endfor %}
     <br>
@@ -67,6 +68,26 @@
 
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
+        }
+
+        function downloadImageWithText(imageUrl, text) {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = imageUrl;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                ctx.font = '20px Arial';
+                ctx.fillStyle = 'black';
+                ctx.fillText(text, 10, img.height - 30);
+                const link = document.createElement('a');
+                link.download = 'image_with_text.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
         }
     </script>
 </body>
